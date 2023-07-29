@@ -1,0 +1,94 @@
+@import './c_common.scss';
+
+input {
+    font-size: 14px;
+    height: 32px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+
+    &.error  {
+        border-color: $error-color;
+    }
+
+    &:focus-visible {
+        box-shadow: 7px 7px 15px #bebebe,
+                   -7px -7px 15px #ffffff;
+        transform: translate(-1px, -1px);
+        outline: none;
+        border: 1px solid $primary-color;
+    }
+}
+
+header {
+    text-align: center;
+}
+
+footer {
+    &.actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+    padding-bottom: 36px;
+
+    .error-message {
+        color: $error-color;
+        width: 100%;
+        text-align: end;
+    }
+
+    .form-row {
+        // display: flex;
+        // justify-content: space-between;
+        // flex-direction: column;
+
+        .label, .field {
+            width: 100%;
+        }
+    }
+}
+
+button {
+    border-radius: 6px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    color: #fff;
+    cursor: pointer;
+    // transition: all 0.25s;
+
+    &:hover {
+        box-shadow: 7px 7px 15px #bebebe,
+                   -7px -7px 15px #ffffff;
+        transform: translate(-2px, -2px);
+    }
+
+    &:active {
+        transform: translate(2px, 2px);
+        box-shadow: none;
+    }
+
+    &.btn-primary {
+        background-color: $primary-color;
+    }
+
+    &.btn-secondary {
+        background-color: $secondary-color;
+        color: #383838;
+    }
+
+    &.btn-error {
+        background-color: $error-color;
+    }
+}

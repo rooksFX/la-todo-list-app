@@ -1,0 +1,88 @@
+$xsmall: 640px;
+$small: 768px;
+$medium: 1024px;
+$large: 1280px;
+$xlarge: 1920px;
+
+$border-color: #e5f3ff;
+
+$primary-color: #2699fb;
+$secondary-color: #d4d4d4;
+$error-color: #ff4742;
+
+$primary-color_des: #43a7ff;
+$error-color_des: #ff5852;
+
+$main-background-color: #f1f8Fb;
+$background-color: #3fa6ff;
+$content-background-color: #fcfdff;
+
+$card-box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+
+@mixin xsmall {
+    @media (min-width: #{$xsmall}) {
+        @content;
+    }
+}
+
+@mixin xsmall-portrait {
+    @media (min-width: #{$xsmall}) and (orientation: portrait) {
+        @content;
+    }
+}
+
+@mixin xsmall-landscape {
+    @media (min-width: #{$xsmall}) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin small {
+    @media (min-width: #{$small}) {
+        @content;
+    }
+}
+
+// phone and tablet portrait
+@mixin small-portrait {
+    @media (min-width: #{$small}) and (orientation: portrait) {
+        @content;
+    }
+}
+
+// phone - landscape
+@mixin small-landscape {
+    @media (min-width: #{$small}) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin medium {
+    @media (min-width: #{$medium}) {
+        @content;
+    }
+}
+
+@mixin medium-portrait {
+    @media (min-width: #{$medium}) and (orientation: portrait) {
+        @content;
+    }
+}
+
+@mixin medium-landscape {
+    @media (min-width: #{$medium}) and (orientation: landscape) {
+        @content;
+    }
+}
+
+@mixin large {
+    @media (min-width: #{$large}) {
+        @content;
+    }
+}
+
+@mixin xlarge {
+    @media (min-width: #{$xlarge}) {
+        @content;
+    }
+}
