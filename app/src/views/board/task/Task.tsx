@@ -1,5 +1,7 @@
-import Card from '../../../components/card/Card';
+import { EditFilled, DeleteFilled } from '@ant-design/icons';
+
 import { ITask } from '../../../context/types';
+import Card from '../../../components/card/Card';
 import './task.scss';
 
 interface ITaskProps {
@@ -31,8 +33,8 @@ const Task = ({ data, editTask, deleteTask, updateTaskStatus }: ITaskProps) => {
             <Card>
                 <>  
                     <header className='actions'>
-                        <button className='btn-primary' onClick={editTask}>EDIT</button>
-                        <button className='btn-error' onClick={deleteTask}>X</button>
+                        <button className='btn-primary btn-icon' onClick={editTask}><EditFilled /></button>
+                        <button className='btn-error btn-icon' onClick={deleteTask}><DeleteFilled /></button>
                     </header>
                     <div className="task-detail"><h3>{data.order}: {data.task}</h3></div>
                     <footer className='actions status-actions'>
