@@ -1,16 +1,17 @@
 import { Dispatch, createContext, useReducer } from 'react';
-import { ActionTypes, IState, IUserSignin, TActionTypes } from './types';
+import { ActionTypes, IState, ITask, IUserSignin, TActionTypes } from './types';
 import Reducer from './Reducer';
 
 const DEV_API = 'http://localhost:8000';
 
 const initialState: IState = {
-    sessionToken: 'test',
+    sessionToken: '',
     user: {
         name: '',
         email: '',
+        session: '',
     },
-    userTasks: null,
+    tasks: []
 }
 
 export const AppContext = createContext<IState>(initialState);
@@ -24,7 +25,7 @@ export const AppProvider = ({ children } : { children: JSX.Element }) => {
         console.log('signinAction | payload: ', payload);
         console.log('signinAction | JSON.stringify(payload): ', JSON.stringify(payload));
         try {
-            const response = await fetch(`/api/signin`, {
+            const response = await fetch(`/api/auth/signin`, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -39,18 +40,19 @@ export const AppProvider = ({ children } : { children: JSX.Element }) => {
     
                 const { message: {
                     email, name
-                }, sessionToken } = data;
+                }, token } = data;
     
                 console.log('data: ', data);
     
-                localStorage.setItem('session_token', sessionToken)
+                localStorage.setItem('session_token', token);
+                localStorage.setItem('email', email);
 
                 dispatch({
                     type: ActionTypes.SIGNIN_SUCCESS_ACTION,
                     payload: {
                         email,
                         name,
-                        sessionToken,
+                        sessionToken: token,
                     }
                 })
             }
@@ -63,13 +65,31 @@ export const AppProvider = ({ children } : { children: JSX.Element }) => {
         }
     };
 
+    const updateTasksAction = (payload: ITask[]) => {
+        dispatch({
+            type: ActionTypes.GET_USER_TASKS_SUCCESS_ACTION,
+            payload
+        })
+    }
+
+
+    const logoutAction = () => {
+        localStorage.removeItem('session_token');
+        localStorage.removeItem('email');
+        dispatch({
+            type: ActionTypes.LOGOUT_ACTION
+        });
+    }
+
     return (
         <AppContext.Provider
             value={{
                 signinAction: signinAction,
+                updateTasksAction: updateTasksAction,
+                logoutAction: logoutAction,
                 sessionToken: state.sessionToken,
                 user: state.user,
-                userTasks: state.userTasks
+                tasks: state.tasks
             }}
         >
             {children}

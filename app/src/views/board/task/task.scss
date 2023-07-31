@@ -1,0 +1,24 @@
+.task {
+    margin: 12px;
+    .card {
+        border-radius: 4px;
+        min-height: fit-content !important;
+        box-shadow: none;
+
+        h3 {
+            margin: 0;
+        }
+
+        .task-detail {
+            margin: 24px 0;
+        }
+        
+        button {
+            font-size: 12px !important;
+        }
+
+        .status-actions {
+            gap: 0;
+        }
+    }
+}

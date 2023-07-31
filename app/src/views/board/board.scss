@@ -1,0 +1,52 @@
+@import '../../c_common.scss';
+
+#board {
+    width: 90vw;
+
+    header {
+        display: flex;
+        justify-content: flex-end;
+        .logout {
+            margin: 24px;
+        }
+    }
+    .card {
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+
+        #board-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 36px;
+            height: 100%;
+            flex: 1;
+
+            .column {
+                border-radius: calc(2vmin - 6px);
+                height: 100%;
+
+                h4 {
+                    padding: 12px;
+                    margin: 0;
+                }
+
+                &.todo {
+                    background-color: rgb(246, 227, 227);
+
+                    .add-task {
+                        margin: 12px;
+                    }
+                }
+
+                &.wip {
+                    background-color: rgb(246, 243, 227);
+                }
+
+                &.done {
+                    background-color: rgb(228, 246, 227);
+                }
+            }
+        }
+    }
+}

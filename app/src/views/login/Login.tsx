@@ -1,14 +1,21 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '../../components/card/Card';
 import './login.scss';
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useEffect } from 'react';
 import { AppContext } from '../../context/State';
 
 const Login = () => {
+    const navigate = useNavigate();
+
     const { signinAction, sessionToken } = useContext(AppContext)
 
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (sessionToken) navigate('/board');
+    }, [sessionToken]);
+    
 
     const handleLogin = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

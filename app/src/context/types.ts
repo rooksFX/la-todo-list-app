@@ -3,13 +3,16 @@ import { Dispatch } from "react";
 export interface IState {
     sessionToken: string;
     user: IUser;
-    userTasks: IUserTasks | null;
+    tasks: ITask[] | null;
     signinAction?: Dispatch<IUserSignin>;
+    updateTasksAction?: Dispatch<ITask[]>;
+    logoutAction?: () => void;
 }
 
 export interface IUser {
     name: string;
     email: string;
+    session: string;
 }
 
 export interface IUserTasks {
@@ -18,9 +21,10 @@ export interface IUserTasks {
 }
 
 export interface ITask {
-    id: string;
+    _id?: string;
     task: string;
-    title: string;
+    email: string;
+    order?: number;
     status: string;
 }
 
@@ -48,6 +52,7 @@ export interface IGetUserTasksSuccessPayload {
 
 export type TAPIResponse = {
     success: boolean;
+    data?: ITask[] | IUser;
     message: string;
 }
 
@@ -64,15 +69,18 @@ export enum ActionTypes {
     GET_USER_TASKS_SUCCESS_ACTION = 'GET_USER_TASKS_SUCCESS_ACTION',
     GET_USER_TASKS_ERROR_ACTION = 'GET_USER_TASKS_ERROR_ACTION',
 
-
+    SET_TASKS_ACTION = 'SET_TASKS_ACTION',
 
     SET_ERROR = 'SET_ERROR',
     SET_RESULTS = 'SET_RESULTS',
+
+    LOGOUT_ACTION = 'LOGOUT_ACTION',
 }
 
 export type TActionTypes = 
     { type: ActionTypes.SIGNUP_ACTION, payload: IUserSignup }
     | { type: ActionTypes.SIGNIN_SUCCESS_ACTION, payload: IUserSigninSuccessPayload }
     | { type: ActionTypes.SIGNIN_ACTION, payload: IUserSignin }
-    | { type: ActionTypes.GET_USER_TASKS_SUCCESS_ACTION, payload: IUserTasks }
+    | { type: ActionTypes.GET_USER_TASKS_SUCCESS_ACTION, payload: ITask[] }
     | { type: ActionTypes.GET_USER_TASKS_ACTION }
+    | { type: ActionTypes.LOGOUT_ACTION }

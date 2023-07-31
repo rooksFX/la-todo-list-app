@@ -2,42 +2,31 @@ import { useRef, useState } from 'react';
 import Card from '../../components/card/Card';
 import { IUserSignup, TAPIResponse } from '../../context/types';
 import './signup.scss';
+import { signupPost } from './SignupService';
+import Toaster from '../../components/toaster/Toaster';
 
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
-const signUpAction = async (payload: IUserSignup) => {
-    try {
-        const response = await fetch('/api/signup', {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify(payload)
-            }
-        )
-        if (response.ok) {
-            const APIResponse: TAPIResponse = {
-                success: true,
-                message: 'Account created.'
-            }
-            return APIResponse;
-        }
-        else {
-            throw 'Something went wrong...'
-        }
-    } catch (error) {
-        const APIResponse: TAPIResponse = {
-            success: false,
-            message: error as unknown as string
-        }
-        return APIResponse;
-    }
-}
 
 type TFieldError = {
     field: string;
     error: string;
+}
+
+const validateForm = (body: IUserSignup) => {
+    const errors = [];
+    const { name, email, password, password_confirmation: passwordConfirmation } = body;
+
+    if (!name) errors.push({ field: 'name', error: 'required' });
+    if (!email) errors.push({ field: 'email', error: 'required' });
+
+    if (!emailRegexp.test(email as string)) errors.push({ field: 'email', error: 'invalid email' });
+
+    if (!password) errors.push({ field: 'password', error: 'required' });
+    if (!passwordConfirmation) errors.push({ field: 'passwordConfirmation', error: 'required' });
+
+    if (password !== passwordConfirmation) errors.push({ field: 'passwordConfirmation', error: 'mismatch' });
+
+    return errors;
 }
 
 const Signup = () => {
@@ -46,25 +35,22 @@ const Signup = () => {
     const passwordRef = useRef<HTMLInputElement>(null);
     const passwordConfirmationRef = useRef<HTMLInputElement>(null);
 
-    const [errors, setFormErrors] = useState<TFieldError[]>([])
+    const [componentKey, setComponentKey] = useState(0);
+    const [errors, setFormErrors] = useState<TFieldError[]>([]);
+    const [toasterMessage, setToasterMessage] = useState('');
+    const [toasterType, setToasterType] = useState('')
 
     const handleSignup = async () => {
+        setFormErrors([]);
+
         const name = nameRef?.current?.value;
         const email = emailRef?.current?.value;
         const password = passwordRef?.current?.value;
         const passwordConfirmation = passwordConfirmationRef?.current?.value;
 
-        const errors = [];
+        const body = { name, email, password, password_confirmation: passwordConfirmation };
 
-        if (!name) errors.push({ field: 'name', error: 'required' });
-        if (!email) errors.push({ field: 'email', error: 'required' });
-
-        if (!emailRegexp.test(email as string)) errors.push({ field: 'email', error: 'invalid email' });
-
-        if (!password) errors.push({ field: 'password', error: 'required' });
-        if (!passwordConfirmation) errors.push({ field: 'passwordConfirmation', error: 'required' });
-
-        if (password !== passwordConfirmation) errors.push({ field: 'passwordConfirmation', error: 'mismatch' });
+        const errors = validateForm(body as IUserSignup);
 
         console.log('errors: ', errors);
 
@@ -74,11 +60,21 @@ const Signup = () => {
             return;
         }
 
-        const payload = { name, email, password, password_confirmation: passwordConfirmation };
+        const APIResponse = await signupPost(body as IUserSignup);
 
-        const APIResponse = await signUpAction(payload);
-
-        alert(`Signup: ${APIResponse.message}`);
+        if (APIResponse.success) {
+            setToasterType('success');
+            setComponentKey(componentKey + 1);
+        }
+        else {
+            setToasterType('error');
+        }
+        setToasterMessage(APIResponse.message);
+        
+        setTimeout(() => {
+            setToasterType('');
+            setToasterMessage('');
+        }, 2000);
     }
 
     const hasError = (field: string) => {
@@ -93,11 +89,11 @@ const Signup = () => {
     }
 
     return (
-        <div id="signup">
+        <div id="signup" key={componentKey} >
             <Card>
                 <>
                     <header><h2>Signup</h2></header>
-                    <div className="content">
+                    <div className="content" draggable>
                         <form>
                             <div className="form-row">
                                 <div className="label">Name: </div>
@@ -136,6 +132,9 @@ const Signup = () => {
                                 </div>
                             </div>
                         </form>
+                        <div className="error-message">
+                            {renderError('name')}
+                        </div>
                     </div>
                     <footer className="actions" >
                         <button className='btn-primary' onClick={handleSignup}>SIGNUP</button>
@@ -143,6 +142,7 @@ const Signup = () => {
                     </footer>
                 </>
             </Card>
+             <Toaster message={toasterMessage} type={toasterType} />
         </div>
     )
 }

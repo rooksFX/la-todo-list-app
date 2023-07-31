@@ -1,0 +1,83 @@
+@import '../../c_common.scss';
+
+.modal-slot {
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    inset: 0 0 0 0;
+    justify-content: center;
+    position: fixed;
+    width: 100vw;
+    height: 100%;
+    z-index: 999;
+
+    .modal {
+        animation: modalEntrance 1s ease 0s 1 normal forwards;
+        background-color: $content-background-color;
+        border-radius: 12px;
+        box-shadow: $card-box-shadow;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        justify-content: space-between;
+        min-height: 10px;
+        padding: 16px;
+        width: 90vw;
+
+
+        @include small {
+            width: 70vw;
+        }
+
+        @include medium {
+            width: 50vw;
+        }
+
+        .footer {
+            display: flex;
+            gap: 16px;
+            justify-content: space-between;
+
+            button {
+                background-color: #2699fb;
+                border: none;
+                border-radius: 8px;
+                box-shadow: $card-box-shadow;
+
+                color: #fff;
+                flex: 1;
+                padding: 12px;
+                text-align: center;
+            
+                &:hover {
+                    background-color: #36a1ff;
+                    box-shadow: 6px 6px 14px -6px rgba(0,0,0,0.32);
+                }
+        
+                &:active {
+                    background-color: #0088ff;
+                    box-shadow: none;
+                    transform: translate(1px, 1px);
+                }
+
+                h4 {
+                    margin: 4px;
+                }
+            }
+        }
+    }
+}
+
+
+
+@keyframes modalEntrance {
+	0% {
+		opacity: 0;
+		transform: translateY(-50vh);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+  }

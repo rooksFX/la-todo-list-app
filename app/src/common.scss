@@ -6,7 +6,7 @@ input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%;
+    width: -webkit-fill-available;
 
     &.error  {
         border-color: $error-color;
@@ -23,6 +23,11 @@ input {
 
 header {
     text-align: center;
+    &.actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
 }
 
 footer {
@@ -90,5 +95,23 @@ button {
 
     &.btn-error {
         background-color: $error-color;
+    }
+
+    &.btn-link {
+        background-color: #fff;
+        color:#383838;
+        border-bottom: 2px solid $primary-color;
+        border-radius: 0;
+
+        &:hover {
+            box-shadow: 3px 3px 7px #bebebe,
+                    -3px -3px 7px #ffffff;
+            transform: translate(-1px, -1px);
+        }
+
+        &:active {
+            transform: translate(1px, 1px);
+            box-shadow: none;
+        }
     }
 }

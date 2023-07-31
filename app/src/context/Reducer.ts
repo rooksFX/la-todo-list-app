@@ -9,14 +9,27 @@ export default ( state: IState, action: TActionTypes ): IState => {
                 sessionToken: action.payload.sessionToken,
                 user: {
                     email: action.payload.email,
-                    name: action.payload.name
+                    name: action.payload.name,
+                    session: action.payload.sessionToken,
                 }
             }
         case ActionTypes.GET_USER_TASKS_SUCCESS_ACTION:
             return {
                 ...state,
-                userTasks: action.payload
+                tasks: action.payload
             }
+        case ActionTypes.LOGOUT_ACTION:
+            return {
+                ...state,
+                sessionToken: '',
+                user: {
+                    name: '',
+                    email: '',
+                    session: '',
+                },
+            }
+
+
         default:
             return state
         

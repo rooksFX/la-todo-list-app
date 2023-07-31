@@ -48,24 +48,30 @@ const validateForm = (form: TForm) => {
 export const signup = async ( req: Request, res: Response ) => {
     let { name, email, password, password_confirmation  } = req.body;
 
+    email = email.toLowerCase();
+
     const errors = validateForm(req.body);
 
     console.log('signup | req.body: ', req.body);
 
     if (errors.length > 0) {
+        console.log('signup | errors: ', errors);
         return res.status(422).json({ errors: errors });
     }
 
     try {
+        console.log('-- email: ', email);
         const user = await UserModel.findOne({email: email});
+        console.log('-- user: ', user);
         
         if(user){
+            console.log('signup | email already exists:');
             return res.status(422).json({ errors: [{ user: "email already exists" }] });
          }
          else {
             const user = new UserModel({
               name: name,
-              email: email.toLowerCase(),
+              email: email,
               password: password,
             });
             bcrypt.genSalt(10, (err, salt) => { 
@@ -89,20 +95,14 @@ export const signup = async ( req: Request, res: Response ) => {
          });
         }
     } catch (error) {
-        console.error('root | error:', error);
         res.status(500).json({
-          errors: [{ error: 'Something went wrong' }]
+            errors: [{ error }]
         });
     }
 }
 
 export const signin = async (req: Request, res: Response) => {
     let { email, password } = req.body;
-
-    console.log('signin | req: ', req);
-    console.log('signin | req.body: ', req.body);
-    console.log('signin | email: ', email);
-    console.log('signin | password: ', password);
 
     // Add form validation
 
@@ -156,6 +156,8 @@ export const signin = async (req: Request, res: Response) => {
 
         }
     } catch (error) {
-        
+        res.status(500).json({
+            errors: [{ error }]
+        });
     }
 }

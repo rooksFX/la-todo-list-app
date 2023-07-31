@@ -5,6 +5,7 @@ import dotenv  from 'dotenv';
 
 import { connectDB } from './db';
 import authRoutes from './routes/auth';
+import tasksRoutes from './routes/tasks';
 
 dotenv.config();
 
@@ -24,10 +25,11 @@ app.get('/', (req, res) => {
 });
 
 //routes middleware
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', tasksRoutes);
 
 const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
- console.log(`Welcome to the mern auth tutorial! Server is running on ${port}`)
+ console.log(`Server is running on ${port}`)
 });
