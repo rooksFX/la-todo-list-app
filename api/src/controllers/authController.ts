@@ -45,37 +45,35 @@ const validateForm = (form: TForm) => {
       return errors;
 }
 
-export const signup = async ( req: Request, res: Response ) => {
+export const register = async ( req: Request, res: Response ) => {
     let { name, email, password, password_confirmation  } = req.body;
 
     email = email.toLowerCase();
 
     const errors = validateForm(req.body);
 
-    console.log('signup | req.body: ', req.body);
-
     if (errors.length > 0) {
-        console.log('signup | errors: ', errors);
         return res.status(422).json({ errors: errors });
     }
 
     try {
-        console.log('-- email: ', email);
         const user = await UserModel.findOne({email: email});
-        console.log('-- user: ', user);
         
-        if(user){
-            console.log('signup | email already exists:');
-            return res.status(422).json({ errors: [{ user: "email already exists" }] });
-         }
-         else {
+        if (user) {
+            if (user.name === name) {
+                return res.status(422).json({ error: "Name already exists." });
+            }
+            else if (user.email === email) {
+                return res.status(422).json({ error: "Email already exists." });
+            }
+        }
+        else {
             const user = new UserModel({
               name: name,
               email: email,
               password: password,
             });
             bcrypt.genSalt(10, (err, salt) => { 
-                console.log('salt: ', salt);
                 bcrypt.hash(password, salt, (err, hash) => {
                     if (err) throw err;
                     user.password = hash;
@@ -86,22 +84,17 @@ export const signup = async ( req: Request, res: Response ) => {
                             result: response
                         })
                     } catch (error) {
-                        console.error('genSalt > hash | error:', error);
-                        res.status(500).json({
-                            errors: [{ error }]
-                        });
+                        res.status(500).json({ error });
                     }
             });
          });
         }
     } catch (error) {
-        res.status(500).json({
-            errors: [{ error }]
-        });
+        res.status(500).json({ error });
     }
 }
 
-export const signin = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
     let { email, password } = req.body;
 
     // Add form validation
@@ -112,28 +105,20 @@ export const signin = async (req: Request, res: Response) => {
         
         // If user not found, respond w/ error 404
         if (!user) {
-            return res.status(404).json(
-                {
-                    errors: [{ user: "not found" }],
-                }
-            );
+            return res.status(404).json({ error: "User not found." });
         } else {
             // Else check if password matches
             try {
                 const isMatch = bcrypt.compare(password, user.password);
                 // If not match, respond w/ error 400
                 if (!isMatch) {
-                    return res.status(400).json(
-                        {
-                            errors: [{ password: "incorrect" }] 
-                        }
-                    );
+                    return res.status(400).json({ error: "Incorrect password." });
                 }
                 // else create Token
                 let access_token = createJWT(
                     user.email,
                     user._id as unknown as  string,
-                    3600
+                    parseInt(process.env.ACCESS_TOKEN_DURATION as string)
                 );
                 jwt.verify(access_token, process.env.TOKEN_SECRET as string, 
                         (error, decoded) => {
@@ -150,14 +135,11 @@ export const signin = async (req: Request, res: Response) => {
                     }
                 );
             } catch (error) {
-                console.log('error: ', error);
                 res.status(500).json({ error });
             }
 
         }
     } catch (error) {
-        res.status(500).json({
-            errors: [{ error }]
-        });
+        res.status(500).json({ error });
     }
 }
