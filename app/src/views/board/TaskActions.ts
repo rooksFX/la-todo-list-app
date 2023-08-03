@@ -10,7 +10,9 @@ export const getTasksAction = async (email: string, session: string) => {
         const response = await fetch(`/api/tasks/get?email=${email}`, {
             headers: { 'Authorization': `Bearer ${session || sessionToken}` }
         });
-        const data = await response.json();
+        const data = await response.clone().json();
+
+        console.log('getTasksAction | data: ', data);
 
         if (response.ok) {
             const APIResponse: TAPIResponse = {
