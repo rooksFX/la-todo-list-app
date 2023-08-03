@@ -1,5 +1,3 @@
-import { Dispatch } from "react";
-
 export interface IState {
     sessionToken: string;
     user: IUser;

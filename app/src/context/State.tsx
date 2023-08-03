@@ -1,5 +1,5 @@
 import { Dispatch, createContext, useReducer } from 'react';
-import { ActionTypes, IState, ITask, IUser, IUserLogin, TActionTypes } from './types';
+import { ActionTypes, IState, ITask, IUser, TActionTypes } from './types';
 import Reducer from './Reducer';
 
 const initialState: IState = {

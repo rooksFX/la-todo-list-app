@@ -1,5 +1,5 @@
 import { useRef, useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { AppContext } from '../../context/State';
 import { IUser, TAPIResponse } from '../../context/types';
