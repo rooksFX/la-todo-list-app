@@ -1,0 +1,19 @@
+{
+  "name": "tasks-app",
+  "version": "1.0.0",
+  "description": "Tasks App Test for Law Advisors",
+  "main": "index.ts",
+    "scripts": {
+        "install-server": "cd api && npm install",
+        "start-server": "cd api && npm run dev",
+        "install-client": "cd app && npm install",
+        "build-client": "cd app && npm run build",
+        "start-client": "cd app && npm run dev",
+        "start-app": "concurrently \"npm run start-server\" \"npm run start-client\""
+    },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
