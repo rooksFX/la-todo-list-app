@@ -7,6 +7,8 @@ export const getTasks = async ( req: Request, res: Response ) => {
     try {
         const tasks = await TaskModel.find({ email: email, })
 
+        console.log('getTasks | tasks: ', tasks);
+
         if (!tasks.length) {
             return res.status(404).json({ error: "No task yet created." });
         }
@@ -35,7 +37,10 @@ export const createTask = async ( req: Request, res: Response ) => {
             order: order,
             status: status,
         });
-        const response = newTask.save();
+        newTask.save();
+
+        console.log('createTask | newTask: ', newTask);
+
         res.status(200).json({
             success: true,
             result: newTask
@@ -49,6 +54,9 @@ export const updateTask = async ( req: Request, res: Response ) => {
     let { _id } = req.body;
     try {
         const updatedTask = await TaskModel.findByIdAndUpdate(_id, req.body, {new: true});
+
+        console.log('updateTask | updatedTask: ', updatedTask);
+
         if (!updatedTask) {
             return res.status(400).json({
                 success: false,
@@ -70,6 +78,9 @@ export const patchTask = async ( req: Request, res: Response ) => {
     let { _id: id } = req.body;
     try {
         const updatedTask = await TaskModel.findByIdAndUpdate(id, req.body, {new: true});
+
+        console.log('patchTask | updatedTask: ', updatedTask);
+
         if (!updatedTask) {
             return res.status(400).json({
                 success: false,
@@ -118,6 +129,9 @@ export const deleteTask = async ( req: Request, res: Response ) => {
     const { id } = req.params;
     try {
         const task = await TaskModel.findByIdAndDelete(id);
+
+        console.log('deleteTask | task: ', task);
+
         if (!task) {
             return res.status(400).json({
                 success: false,
