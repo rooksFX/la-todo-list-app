@@ -26,6 +26,10 @@ export const getTasks = async ( req: Request, res: Response ) => {
 export const createTask = async ( req: Request, res: Response ) => {
     let { email, task, status } = req.body;
 
+    console.log('createTask started... ');
+    console.log('createTask | req: ', req);
+    console.log('createTask | req.body: ', req.body);
+
     try {
         const tasks = await TaskModel.find({ email: email, });
         
@@ -52,6 +56,10 @@ export const createTask = async ( req: Request, res: Response ) => {
 
 export const updateTask = async ( req: Request, res: Response ) => {
     let { _id } = req.body;
+
+    console.log('updateTask started... ');
+    console.log('updateTask | req: ', req);
+    console.log('updateTask | req.body: ', req.body);
     try {
         const updatedTask = await TaskModel.findByIdAndUpdate(_id, req.body, {new: true});
 
@@ -76,6 +84,11 @@ export const updateTask = async ( req: Request, res: Response ) => {
 
 export const patchTask = async ( req: Request, res: Response ) => {
     let { _id: id } = req.body;
+    let { _id } = req.body;
+
+    console.log('patchTask started... ');
+    console.log('patchTask | req: ', req);
+    console.log('patchTask | req.body: ', req.body);
     try {
         const updatedTask = await TaskModel.findByIdAndUpdate(id, req.body, {new: true});
 
@@ -100,6 +113,10 @@ export const patchTask = async ( req: Request, res: Response ) => {
 
 export const reorderTasks = async ( req: Request, res: Response ) => {
     const { firstID, firstOrder, secondID, secondOrder } = req.body;
+
+    console.log('reorderTasks started... ');
+    console.log('reorderTasks | req: ', req);
+    console.log('reorderTasks | req.body: ', req.body);
     try {
         const firstTask = await TaskModel.findById(firstID);
         const secondTask = await TaskModel.findById(secondID);
@@ -127,6 +144,10 @@ export const reorderTasks = async ( req: Request, res: Response ) => {
 
 export const deleteTask = async ( req: Request, res: Response ) => {
     const { id } = req.params;
+
+    console.log('deleteTask started... ');
+    console.log('deleteTask | req: ', req);
+    console.log('deleteTask | req.body: ', req.body);
     try {
         const task = await TaskModel.findByIdAndDelete(id);
 
