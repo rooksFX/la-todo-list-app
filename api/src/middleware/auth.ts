@@ -7,14 +7,14 @@ export interface CustomRequest extends Request {
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    const token = (authHeader as string)?.split('_')[1] || '';
+    const token = (authHeader as string)?.split(' ')[1] || '';
 
     try {
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
         (req as CustomRequest).token = decoded;
         next();
     } catch (error) {
-        res.status(500).json({ msg: error });
+        res.status(401).json({ msg: error });
     }
 }
 

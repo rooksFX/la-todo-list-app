@@ -38,7 +38,7 @@ export const createTask = async ( req: Request, res: Response ) => {
         const response = newTask.save();
         res.status(200).json({
             success: true,
-            result: response
+            result: newTask
         });
     } catch (error) {
         res.status(500).json({ error });
@@ -46,9 +46,9 @@ export const createTask = async ( req: Request, res: Response ) => {
 };
 
 export const updateTask = async ( req: Request, res: Response ) => {
-    let { _id: id } = req.body;
+    let { _id } = req.body;
     try {
-        const updatedTask = await TaskModel.findByIdAndUpdate(id, req.body, {new: true});
+        const updatedTask = await TaskModel.findByIdAndUpdate(_id, req.body, {new: true});
         if (!updatedTask) {
             return res.status(400).json({
                 success: false,
@@ -85,6 +85,33 @@ export const patchTask = async ( req: Request, res: Response ) => {
     } catch (error) {
         res.status(500).json({ error });
     }
+};
+
+export const reorderTasks = async ( req: Request, res: Response ) => {
+    const { firstID, firstOrder, secondID, secondOrder } = req.body;
+    try {
+        const firstTask = await TaskModel.findById(firstID);
+        const secondTask = await TaskModel.findById(secondID);
+
+        if (!firstTask || !secondTask) {
+            return res.status(400).json({
+                success: false,
+                error: 'No matching tasks found'
+            });
+        }
+        else {
+            await firstTask.updateOne({ order: firstOrder});
+            await secondTask.updateOne({ order: secondOrder});
+            return res.status(200).json({
+                success: true,
+                data: { message: 'Tasks updated.' }
+            });
+        }
+        
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+
 };
 
 export const deleteTask = async ( req: Request, res: Response ) => {

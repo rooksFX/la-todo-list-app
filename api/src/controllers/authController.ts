@@ -61,7 +61,7 @@ export const register = async ( req: Request, res: Response ) => {
         
         if (user) {
             if (user.name === name) {
-                return res.status(422).json({ error: "Name already exists." });
+                return res.status(422).json({ error: "Username already exists." });
             }
             else if (user.email === email) {
                 return res.status(422).json({ error: "Email already exists." });
@@ -97,24 +97,19 @@ export const register = async ( req: Request, res: Response ) => {
 export const login = async (req: Request, res: Response) => {
     let { email, password } = req.body;
 
-    // Add form validation
-
     try {
-        // Find user
         const user = await UserModel.findOne({ email: email });
-        
-        // If user not found, respond w/ error 404
+
         if (!user) {
             return res.status(404).json({ error: "User not found." });
         } else {
-            // Else check if password matches
             try {
-                const isMatch = bcrypt.compare(password, user.password);
-                // If not match, respond w/ error 400
+                const isMatch = await bcrypt.compare(password, user.password);
+
                 if (!isMatch) {
                     return res.status(400).json({ error: "Incorrect password." });
                 }
-                // else create Token
+
                 let access_token = createJWT(
                     user.email,
                     user._id as unknown as  string,
@@ -129,7 +124,7 @@ export const login = async (req: Request, res: Response) => {
                             return res.status(200).json({
                             success: true,
                             token: access_token,
-                            message: user
+                            user: user
                             });
                         }
                     }
