@@ -7,12 +7,8 @@ const sessionToken = localStorage.getItem('session_token') || '';
 
 export const getTasksAction = async (email: string, session: string) => {
     try {
-        const response = await fetch(`/api/tasks/get?email=${email}`, {
-            headers: { 
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session || sessionToken}`
-            }
+        const response = await fetch(`${URL}/api/tasks/get?email=${email}`, {
+            headers: { 'Authorization': `Bearer ${session || sessionToken}` }
         });
         const data = await response.json();
 
