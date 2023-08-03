@@ -10,7 +10,7 @@ import tasksRoutes from './routes/tasks';
 dotenv.config();
 
 const PROD_CLIENTS = [
-    'https://tasks-app-la.onrender.com/login'
+    'https://tasks-app-la.onrender.com'
 ];
 
 const app = express();
