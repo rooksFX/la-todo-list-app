@@ -16,13 +16,13 @@ const PROD_CLIENTS = [
 const app = express();
 
 console.log('process.env.DATABASE as string: ', process.env.DATABASE as string)
+app.use(cors({ origin: PROD_CLIENTS }))
 
 // Connect DB
 connectDB();
 
 // Middlewares
 app.use(bodyParser.json());
-app.use(cors({ origin: PROD_CLIENTS }))
 
 app.get('/', (req, res) => {
     res.send('API up and running...');
