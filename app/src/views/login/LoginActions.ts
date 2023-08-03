@@ -1,8 +1,11 @@
 import { IUser, IUserLogin, TAPIResponse } from "../../context/types";
 
+const PROD_API = 'https://tasks-api-la.onrender.com'
+const URL = process.env.NODE_ENV === 'production' ? PROD_API : '';
+
 export const loginAction = async (payload: IUserLogin) => {
     try {
-        const response = await fetch(`/api/auth/login`, {
+        const response = await fetch(`${URL}/api/auth/login`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'

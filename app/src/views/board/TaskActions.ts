@@ -1,5 +1,8 @@
 import { ITask, TAPIResponse } from "../../context/types";
 
+const PROD_API = 'https://tasks-api-la.onrender.com'
+const URL = process.env.NODE_ENV === 'production' ? PROD_API : '';
+
 const sessionToken = localStorage.getItem('session_token') || '';
 
 export const getTasksAction = async (email: string, session: string) => {
@@ -34,7 +37,7 @@ export const getTasksAction = async (email: string, session: string) => {
 export const upsertTaskAction = async (task: ITask, session: string) => {
     try {
         const upsertType = task.order ? 'update' : 'create';
-        const response = await fetch(`/api/tasks/${upsertType}`, {
+        const response = await fetch(`${URL}/api/tasks/${upsertType}`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -74,7 +77,7 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
             _id: id,
             [field]: value
         }
-        const response = await fetch('/api/tasks/patch', {
+        const response = await fetch(`${URL}/api/tasks/patch`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -112,7 +115,7 @@ export const reorderTasksAction = async (firstID: string, firstOrder: number, se
         const reorder = {
             firstID, firstOrder, secondID, secondOrder
         }
-        const response = await fetch('/api/tasks/reorder', {
+        const response = await fetch(`${URL}/api/tasks/reorder`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -147,7 +150,7 @@ export const reorderTasksAction = async (firstID: string, firstOrder: number, se
 
 export const deleteTaskAction = async (task: ITask, session: string) => {
     try {
-        const response = await fetch(`/api/tasks/delete/${task._id}`, {
+        const response = await fetch(`${URL}/api/tasks/delete/${task._id}`, {
             headers: { 'Authorization': `Bearer ${session || sessionToken}` },
             method: 'DELETE'
         });

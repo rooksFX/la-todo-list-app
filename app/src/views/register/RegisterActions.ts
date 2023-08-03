@@ -1,9 +1,11 @@
 import { IUserRegister, TAPIResponse } from "../../context/types";
 
+const PROD_API = 'https://tasks-api-la.onrender.com'
+const URL = process.env.NODE_ENV === 'production' ? PROD_API : '';
 
 export const registerAction = async (body: IUserRegister) => {
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch(`${URL}/api/auth/register`, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'

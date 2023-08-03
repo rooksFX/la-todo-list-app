@@ -9,6 +9,10 @@ import tasksRoutes from './routes/tasks';
 
 dotenv.config();
 
+const PROD_CLIENTS = [
+    'https://tasks-app-la.onrender.com/login'
+];
+
 const app = express();
 
 console.log('process.env.DATABASE as string: ', process.env.DATABASE as string)
@@ -18,7 +22,7 @@ connectDB();
 
 // Middlewares
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({ origin: PROD_CLIENTS }))
 
 app.get('/', (req, res) => {
     res.send('API up and running...');
