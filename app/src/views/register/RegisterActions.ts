@@ -1,9 +1,9 @@
-import { IUserSignup, TAPIResponse } from "../../context/types";
+import { IUserRegister, TAPIResponse } from "../../context/types";
 
 
-export const signupPost = async (body: IUserSignup) => {
+export const registerAction = async (body: IUserRegister) => {
     try {
-        const response = await fetch('/api/auth/signup', {
+        const response = await fetch('/api/auth/register', {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -14,7 +14,6 @@ export const signupPost = async (body: IUserSignup) => {
         )
 
         const data = await response.json();
-        console.log('data: ', data);
         if (response.ok) {
             const APIResponse: TAPIResponse = {
                 success: true,
@@ -23,10 +22,11 @@ export const signupPost = async (body: IUserSignup) => {
             return APIResponse;
         }
         else {
-            const errorMessage = Object.values(data.errors[0])[0];
+            const errorMessage = data.error;
             throw errorMessage;
         };
     } catch (error) {
+        console.error('Register error: ', error);
         const APIResponse: TAPIResponse = {
             success: false,
             message: error as unknown as string

@@ -1,10 +1,14 @@
 import { ITask, TAPIResponse } from "../../context/types";
 
-export const getTasksAction = async (email: string) => {
+const sessionToken = localStorage.getItem('session_token') || '';
+
+export const getTasksAction = async (email: string, session: string) => {
     try {
-        const response = await fetch(`/api/tasks/get?email=${email}`);
+        const response = await fetch(`/api/tasks/get?email=${email}`, {
+            headers: { 'Authorization': `Bearer ${session || sessionToken}` }
+        });
         const data = await response.json();
-        console.log('getTasks | data: ', data.data );
+
         if (response.ok) {
             const APIResponse: TAPIResponse = {
                 success: true,
@@ -14,10 +18,11 @@ export const getTasksAction = async (email: string) => {
             return APIResponse;
         }
         else {
-            const errorMessage = Object.values(data.errors[0])[0];
+            const errorMessage = data.msg.message;
             throw errorMessage;
         }
     } catch (error) {
+        console.error('Get Tasks error: ', error);
         const APIResponse: TAPIResponse = {
             success: false,
             message: error as unknown as string
@@ -26,32 +31,35 @@ export const getTasksAction = async (email: string) => {
     }
 }
 
-export const upsertTaskAction = async (task: ITask) => {
+export const upsertTaskAction = async (task: ITask, session: string) => {
     try {
         const upsertType = task.order ? 'update' : 'create';
         const response = await fetch(`/api/tasks/${upsertType}`, {
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session || sessionToken}`
             },
             method: upsertType === 'create' ? 'POST' : 'PUT',
             body: JSON.stringify(task)
         })
         const data = await response.json();
+
         if (response.ok) {
             const successMessage = upsertType === 'create' ? 'created' : 'updated';
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: `Task ${successMessage}.`,
-                data: data.data,
+                data: data.result,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = Object.values(data.errors[0])[0];
+            const errorMessage = data.msg.message;
             throw errorMessage;
         }
     } catch (error) {
+        console.error('Upsert Task error: ', error);
         const APIResponse: TAPIResponse = {
             success: false,
             message: error as unknown as string
@@ -60,7 +68,7 @@ export const upsertTaskAction = async (task: ITask) => {
     }
 }
 
-export const patchTaskAction = async (id: string, field: string, value: string) => {
+export const patchTaskAction = async (id: string, field: string, value: string, session: string) => {
     try {
         const task = {
             _id: id,
@@ -69,12 +77,14 @@ export const patchTaskAction = async (id: string, field: string, value: string) 
         const response = await fetch('/api/tasks/patch', {
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session || sessionToken}`
             },
             method: 'PATCH',
             body: JSON.stringify(task)
         })
         const data = await response.json();
+
         if (response.ok) {
             const APIResponse: TAPIResponse = {
                 success: true,
@@ -84,10 +94,11 @@ export const patchTaskAction = async (id: string, field: string, value: string) 
             return APIResponse;
         }
         else {
-            const errorMessage = Object.values(data.errors[0])[0];
+            const errorMessage = data.msg.message;
             throw errorMessage;
         }
     } catch (error) {
+        console.error('Patch Task error: ', error);
         const APIResponse: TAPIResponse = {
             success: false,
             message: error as unknown as string
@@ -96,12 +107,52 @@ export const patchTaskAction = async (id: string, field: string, value: string) 
     }
 }
 
-export const deleteTaskAction = async (task: ITask) => {
+export const reorderTasksAction = async (firstID: string, firstOrder: number, secondID: string, secondOrder: number, session: string) => {
+    try {
+        const reorder = {
+            firstID, firstOrder, secondID, secondOrder
+        }
+        const response = await fetch('/api/tasks/reorder', {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session || sessionToken}`
+            },
+            method: 'PATCH',
+            body: JSON.stringify(reorder)
+        })
+        const data = await response.json();
+
+        if (response.ok) {
+            const APIResponse: TAPIResponse = {
+                success: true,
+                message: 'Tasks updated.',
+                data: data.data,
+            }
+            return APIResponse;
+        }
+        else {
+            const errorMessage = data.msg.message;
+            throw errorMessage;
+        }
+    } catch (error) {
+        console.error('Reorder Tasks error: ', error);
+        const APIResponse: TAPIResponse = {
+            success: false,
+            message: error as unknown as string
+        };
+        return APIResponse;
+    }
+}
+
+export const deleteTaskAction = async (task: ITask, session: string) => {
     try {
         const response = await fetch(`/api/tasks/delete/${task._id}`, {
+            headers: { 'Authorization': `Bearer ${session || sessionToken}` },
             method: 'DELETE'
         });
         const data = await response.json();
+
         if (response.ok) {
             const APIResponse: TAPIResponse = {
                 success: true,
@@ -111,10 +162,11 @@ export const deleteTaskAction = async (task: ITask) => {
             return APIResponse;
         }
         else {
-            const errorMessage = Object.values(data.errors[0])[0];
+            const errorMessage = data.msg.message;
             throw errorMessage;
         }
     } catch (error) {
+        console.error('Delete Task error: ', error);
         const APIResponse: TAPIResponse = {
             success: false,
             message: error as unknown as string

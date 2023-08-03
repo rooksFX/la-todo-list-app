@@ -1,17 +1,20 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import './upsert.scss';
 import { ITask, TAPIResponse } from '../../../context/types';
 import { upsertTaskAction } from '../TaskActions';
 import Modal from '../../../components/modal/Modal';
+import { AppContext } from '../../../context/State';
 
 interface IUpsertProps {
     task: ITask | null
     close: () => void;
     notify: (response: TAPIResponse) => void;
-    updateTasks: (upsertedTask: ITask) => void;
+    upsertTasks: (upsertedTask: ITask) => void;
 }
 
-const Upsert = ({ task, close, notify, updateTasks }: IUpsertProps) => {
+const Upsert = ({ task, close, notify, upsertTasks }: IUpsertProps) => {
+    const { user } = useContext(AppContext);
+
     const taskRef = useRef<HTMLInputElement>(null);
 
     const handleUpdate = async () => {
@@ -19,16 +22,17 @@ const Upsert = ({ task, close, notify, updateTasks }: IUpsertProps) => {
         const email = localStorage.getItem('email') || '';
 
         const upsertedTask: ITask = {
-            ...(task && { _id: task?._id }), 
+            ...(task && { _id: task._id }),
             ...(task && { order: task?.order }), 
             task: taskValue,
             status: task?.status || 'todo',
             email,
         }
 
-        const response = await upsertTaskAction(upsertedTask);
+        const response = await upsertTaskAction(upsertedTask, user.session);
+        console.log('handleUpdate | response: ', response);
         if (response.success) {
-            updateTasks(upsertedTask);
+            upsertTasks(response.data as unknown as ITask);
             close();
         }
 

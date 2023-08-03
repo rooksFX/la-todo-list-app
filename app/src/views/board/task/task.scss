@@ -1,9 +1,47 @@
-.task {
-    margin: 12px;
+.task-slot {
+    margin: 16px;
+
     .card {
-        border-radius: 4px;
+        box-shadow: 3px 3px 7px #bebebe;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: row !important;
         min-height: fit-content !important;
-        box-shadow: none;
+        padding: 12px;
+
+        &:hover {
+            box-shadow: 7px 7px 15px #bebebe;
+            cursor: pointer;
+            transform: translate(-1px, -1px);
+        }
+
+        .reorder-task-slot {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 12px;
+
+            .reorder-btn {
+                padding: 6px;
+
+                &:hover {
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transform: translate(-1px, -1px);
+                }
+                &:active {
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transform: translate(1px, 1px);
+                }
+            }
+        }
+
+        .task {
+            flex: 1;
+        }
 
         h3 {
             margin: 0;
@@ -11,17 +49,21 @@
 
         .task-detail {
             margin: 24px 0;
+            &:hover {
+                cursor: default;
+            }
         }
         
         button {
             font-size: 12px !important;
+            font-weight: 700;
 
             &.btn-icon {
+                border-radius: 50%;
                 font-size: 16px !important;
-                width: 24px !important;
                 height: 24px !important;
                 padding: 6px;
-                border-radius: 50%;
+                width: 24px !important;
             }
         }
 

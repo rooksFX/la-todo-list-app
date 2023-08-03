@@ -1,11 +1,11 @@
 @import './c_common.scss';
 
 input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
     font-size: 14px;
     height: 32px;
     padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     width: -webkit-fill-available;
 
     &.error  {
@@ -13,28 +13,26 @@ input {
     }
 
     &:focus-visible {
-        box-shadow: 7px 7px 15px #bebebe,
-                   -7px -7px 15px #ffffff;
-        transform: translate(-1px, -1px);
-        outline: none;
+        box-shadow: 7px 7px 15px #bebebe;
         border: 1px solid $primary-color;
+        outline: none;
+        transform: translate(-1px, -1px);
     }
 }
 
 header {
-    text-align: center;
     &.actions {
         display: flex;
-        justify-content: flex-end;
         gap: 6px;
+        justify-content: flex-end;
     }
 }
 
 footer {
     &.actions {
         display: flex;
-        justify-content: flex-end;
         gap: 12px;
+        justify-content: flex-end;
     }
 }
 
@@ -42,20 +40,16 @@ form {
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 24px;
+    padding: 24px 0;
     padding-bottom: 36px;
 
     .error-message {
         color: $error-color;
-        width: 100%;
         text-align: end;
+        width: 100%;
     }
 
     .form-row {
-        // display: flex;
-        // justify-content: space-between;
-        // flex-direction: column;
-
         .label, .field {
             width: 100%;
         }
@@ -63,25 +57,23 @@ form {
 }
 
 button {
-    border-radius: 6px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
     color: #fff;
     cursor: pointer;
-    // transition: all 0.25s;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 1em;
+    padding: 0.6em 1.2em;
 
     &:hover {
-        box-shadow: 7px 7px 15px #bebebe,
-                   -7px -7px 15px #ffffff;
+        box-shadow: 3px 3px 7px #5c5c5c;
         transform: translate(-2px, -2px);
     }
 
     &:active {
-        transform: translate(2px, 2px);
         box-shadow: none;
+        transform: translate(2px, 2px);
     }
 
     &.btn-primary {
@@ -99,13 +91,12 @@ button {
 
     &.btn-link {
         background-color: #fff;
-        color:#383838;
-        border-bottom: 2px solid $primary-color;
+        border-bottom: 4px solid $primary-color;
         border-radius: 0;
+        color:#383838;
 
         &:hover {
-            box-shadow: 3px 3px 7px #bebebe,
-                    -3px -3px 7px #ffffff;
+            box-shadow: 3px 3px 7px #bebebe;
             transform: translate(-1px, -1px);
         }
 

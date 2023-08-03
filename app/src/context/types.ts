@@ -4,8 +4,9 @@ export interface IState {
     sessionToken: string;
     user: IUser;
     tasks: ITask[] | null;
-    signinAction?: Dispatch<IUserSignin>;
-    updateTasksAction?: Dispatch<ITask[]>;
+    signinAction?: (payload: IUserLogin) => TAPIResponse;
+    updateTasksAction?: (payload: ITask[]) => void;
+    loginSuccessAction?: (payload: IUser) => void;
     logoutAction?: () => void;
 }
 
@@ -13,11 +14,6 @@ export interface IUser {
     name: string;
     email: string;
     session: string;
-}
-
-export interface IUserTasks {
-    email: string;
-    tasks: ITask[];
 }
 
 export interface ITask {
@@ -28,26 +24,16 @@ export interface ITask {
     status: string;
 }
 
-export interface IUserSignup {
+export interface IUserRegister {
     name: string;
     email: string;
     password: string;
     password_confirmation: string;
 }
 
-export interface IUserSignin {
+export interface IUserLogin {
     email: string;
     password: string;
-}
-
-export interface IUserSigninSuccessPayload {
-    email: string;
-    name: string;
-    sessionToken: string;
-}
-
-export interface IGetUserTasksSuccessPayload {
-    name: string;
 }
 
 export type TAPIResponse = {
@@ -57,30 +43,12 @@ export type TAPIResponse = {
 }
 
 export enum ActionTypes {
-    SIGNUP_ACTION = 'SIGNUP_ACTION',
-    SIGNUP_SUCCESS_ACTION = 'SIGNUP_SUCCESS_ACTION',
-    SIGNUP_ERROR_ACTION = 'SIGNUP_ERROR_ACTION',
-
-    SIGNIN_ACTION = 'SIGNIN_ACTION',
-    SIGNIN_SUCCESS_ACTION = 'SIGNIN_SUCCESS_ACTION',
-    SIGNIN_ERROR_ACTION = 'SIGNIN_ERROR_ACTION',
-    
-    GET_USER_TASKS_ACTION = 'GET_USER_TASKS_ACTION',
     GET_USER_TASKS_SUCCESS_ACTION = 'GET_USER_TASKS_SUCCESS_ACTION',
-    GET_USER_TASKS_ERROR_ACTION = 'GET_USER_TASKS_ERROR_ACTION',
-
-    SET_TASKS_ACTION = 'SET_TASKS_ACTION',
-
-    SET_ERROR = 'SET_ERROR',
-    SET_RESULTS = 'SET_RESULTS',
-
+    LOGIN_SUCCESS_ACTION = 'LOGIN_SUCCESS_ACTION',
     LOGOUT_ACTION = 'LOGOUT_ACTION',
 }
 
 export type TActionTypes = 
-    { type: ActionTypes.SIGNUP_ACTION, payload: IUserSignup }
-    | { type: ActionTypes.SIGNIN_SUCCESS_ACTION, payload: IUserSigninSuccessPayload }
-    | { type: ActionTypes.SIGNIN_ACTION, payload: IUserSignin }
+    | { type: ActionTypes.LOGIN_SUCCESS_ACTION, payload: IUser }
     | { type: ActionTypes.GET_USER_TASKS_SUCCESS_ACTION, payload: ITask[] }
-    | { type: ActionTypes.GET_USER_TASKS_ACTION }
     | { type: ActionTypes.LOGOUT_ACTION }

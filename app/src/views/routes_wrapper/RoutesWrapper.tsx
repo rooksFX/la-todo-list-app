@@ -1,8 +1,10 @@
 import { Route, Routes } from 'react-router-dom'
+
+import Board from '../board/Board'
 import Home from '../home/Home'
 import Login from '../login/Login'
-import Signup from '../signup/Signup'
-import Board from '../board/Board'
+import Logout from '../logout/Logout'
+import Register from '../register/Register'
 
 const RoutesWrapper = () => {
   return (
@@ -10,7 +12,8 @@ const RoutesWrapper = () => {
       <Routes>
         <Route path='/' element={ <Home /> } />
         <Route path='/login' element={ <Login /> } />
-        <Route path='/signup' element={ <Signup /> } />
+        <Route path='/logout' element={ <Logout /> } />
+        <Route path='/register' element={ <Register /> } />
         <Route path='/board' element={ <Board /> } />
       </Routes>
     </div>

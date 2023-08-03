@@ -1,9 +1,14 @@
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { IUserRegister } from '../../context/types';
+
 import Card from '../../components/card/Card';
-import { IUserSignup, TAPIResponse } from '../../context/types';
-import './signup.scss';
-import { signupPost } from './SignupService';
 import Toaster from '../../components/toaster/Toaster';
+
+import { registerAction } from './RegisterActions';
+
+import './register.scss';
 
 const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
@@ -12,7 +17,7 @@ type TFieldError = {
     error: string;
 }
 
-const validateForm = (body: IUserSignup) => {
+const validateForm = (body: IUserRegister) => {
     const errors = [];
     const { name, email, password, password_confirmation: passwordConfirmation } = body;
 
@@ -30,6 +35,8 @@ const validateForm = (body: IUserSignup) => {
 }
 
 const Signup = () => {
+    const navigate = useNavigate();
+
     const nameRef = useRef<HTMLInputElement>(null);
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
@@ -50,9 +57,7 @@ const Signup = () => {
 
         const body = { name, email, password, password_confirmation: passwordConfirmation };
 
-        const errors = validateForm(body as IUserSignup);
-
-        console.log('errors: ', errors);
+        const errors = validateForm(body as IUserRegister);
 
         if (errors.length) {
             console.log('handleSignup | errors: ', errors);
@@ -60,7 +65,7 @@ const Signup = () => {
             return;
         }
 
-        const APIResponse = await signupPost(body as IUserSignup);
+        const APIResponse = await registerAction(body as IUserRegister);
 
         if (APIResponse.success) {
             setToasterType('success');
@@ -78,7 +83,6 @@ const Signup = () => {
     }
 
     const hasError = (field: string) => {
-        console.log('hasError | errors: ', errors);
         const fields = errors.map(error => error.field);
         return fields.includes(field) ? 'error' : '';
     }
@@ -138,7 +142,7 @@ const Signup = () => {
                     </div>
                     <footer className="actions" >
                         <button className='btn-primary' onClick={handleSignup}>SIGNUP</button>
-                        <button className='btn-secondary'>CANCEL</button>
+                        <button className='btn-secondary' onClick={() => navigate('/login')}>CANCEL</button>
                     </footer>
                 </>
             </Card>

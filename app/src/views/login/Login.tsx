@@ -1,13 +1,23 @@
+import { useRef, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Card from '../../components/card/Card';
-import './login.scss';
-import { useRef, useContext, useEffect } from 'react';
+
 import { AppContext } from '../../context/State';
+import { IUser, TAPIResponse } from '../../context/types';
+
+import Card from '../../components/card/Card';
+import Toaster from '../../components/toaster/Toaster';
+
+import { loginAction } from './LoginActions';
+
+import './login.scss';
 
 const Login = () => {
     const navigate = useNavigate();
 
-    const { signinAction, sessionToken } = useContext(AppContext)
+    const { loginSuccessAction, sessionToken } = useContext(AppContext)
+
+    const [toasterMessage, setToasterMessage] = useState('');
+    const [toasterType, setToasterType] = useState('')
 
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
@@ -23,17 +33,30 @@ const Login = () => {
         const password = passwordRef.current?.value;
 
         if (!email || !password) {
-            alert('Incomplete form')
+                openToaster('Incomplete form.', 'error')
         }
         else {
-            if (signinAction)  {
-                const response = await signinAction({
-                    email, password
-                })
-                console.log('Login | response: ', response);
+            const response: TAPIResponse = await loginAction({ email, password });
+
+            if (response.success && loginSuccessAction) {
+                loginSuccessAction(response.data as IUser);
+                navigate('/board');
+            }
+            else {
+                openToaster(response.message, 'error')
             }
         }
 
+    }
+
+    const openToaster = (message: string, type: string) => {
+                setToasterType(type);
+                setToasterMessage(message);
+                
+                setTimeout(() => {
+                    setToasterType('');
+                    setToasterMessage('');
+                }, 2000);
     }
 
     return (
@@ -42,7 +65,6 @@ const Login = () => {
                 <>
                     <header>
                         <h2>Login</h2>
-                        <h4><Link to="/signup">Signup</Link></h4>
                     </header>
                     <div className="content">
                         <form>
@@ -61,11 +83,12 @@ const Login = () => {
                         </form>
                     </div>
                     <footer className="actions" >
-                        <button className='btn-primary' onClick={handleLogin}>LOGIN</button>
-                        <button className='btn-secondary'>CANCEL</button>
+                        <button className='btn-primary' onClick={handleLogin} >LOGIN</button>
+                        <button className='btn-secondary' onClick={() => navigate('/register')} >REGISTER</button>
                     </footer>
                 </>
             </Card>
+            <Toaster message={toasterMessage} type={toasterType} />
         </div>
     )
 }
