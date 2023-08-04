@@ -75,10 +75,10 @@ export const upsertTaskAction = async (task: ITask, session: string) => {
 
 export const patchTaskAction = async (id: string, field: string, value: string, session: string) => {
     try {
-        const task = {
+        const tasks = [{
             _id: id,
-            [field]: value
-        }
+            field, value
+        }]
         const response = await fetch(`${URL}/api/tasks/patch`, {
             headers: {
                 'Accept': 'application/json',
@@ -86,7 +86,7 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
                 'Authorization': `Bearer ${session || sessionToken}`
             },
             method: 'PATCH',
-            body: JSON.stringify(task)
+            body: JSON.stringify(tasks)
         })
         const data = await response.json();
 
@@ -114,9 +114,18 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
 
 export const reorderTasksAction = async (firstID: string, firstOrder: number, secondID: string, secondOrder: number, session: string) => {
     try {
-        const reorder = {
-            firstID, firstOrder, secondID, secondOrder
-        }
+        const tasksToReorder = [
+            {
+                _id: firstID,
+                field: 'order',
+                value: firstOrder
+            },
+            {
+                _id: secondID,
+                field: 'order',
+                value: secondOrder
+            }
+        ]
         const response = await fetch(`${URL}/api/tasks/reorder`, {
             headers: {
                 'Accept': 'application/json',
@@ -124,7 +133,7 @@ export const reorderTasksAction = async (firstID: string, firstOrder: number, se
                 'Authorization': `Bearer ${session || sessionToken}`
             },
             method: 'PATCH',
-            body: JSON.stringify(reorder)
+            body: JSON.stringify(tasksToReorder)
         })
         const data = await response.json();
 
