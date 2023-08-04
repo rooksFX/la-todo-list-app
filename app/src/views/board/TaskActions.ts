@@ -1,4 +1,4 @@
-import { ITask, TAPIResponse } from "../../context/types";
+import { ITask, TAPIResponse, TTasksToReorder } from "../../context/types";
 
 const PROD_API = 'https://tasks-api-la.onrender.com'
 const URL = process.env.NODE_ENV === 'production' ? PROD_API : '';
@@ -23,7 +23,7 @@ export const getTasksAction = async (email: string, session: string) => {
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.msg? data.msg.message : data.error;
             throw errorMessage;
         }
     } catch (error) {
@@ -55,7 +55,7 @@ export const upsertTaskAction = async (task: ITask, session: string) => {
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: `Task ${successMessage}.`,
-                data: data.result,
+                data: data.data,
             }
             return APIResponse;
         }
@@ -112,20 +112,8 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
     }
 }
 
-export const reorderTasksAction = async (firstID: string, firstOrder: number, secondID: string, secondOrder: number, session: string) => {
+export const reorderTasksAction = async (tasksToReorder: TTasksToReorder[], session: string) => {
     try {
-        const tasksToReorder = [
-            {
-                _id: firstID,
-                field: 'order',
-                value: firstOrder
-            },
-            {
-                _id: secondID,
-                field: 'order',
-                value: secondOrder
-            }
-        ]
         const response = await fetch(`${URL}/api/tasks/reorder`, {
             headers: {
                 'Accept': 'application/json',

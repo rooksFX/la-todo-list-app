@@ -10,6 +10,7 @@ router.get('/get', auth, getTasks);
 router.put('/update', auth, updateTask);
 // router.patch('/patch', auth, patchTask);
 router.patch('/patch', auth, patchTasks);
+router.patch('/reorder', auth, patchTasks);
 router.delete('/delete/:id', auth, deleteTask);
 
 export default router;
