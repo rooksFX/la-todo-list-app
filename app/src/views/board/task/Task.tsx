@@ -32,7 +32,7 @@ const Task = ({ data, editTask, deleteTask, updateTaskStatus, reorderTask }: ITa
     }
 
     return (
-        <div className="task-slot">
+        <div className="task-slot" draggable>
             <Card>
                 <>  
                     <div className="reorder-task-slot">
