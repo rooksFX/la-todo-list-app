@@ -23,7 +23,7 @@ export const getTasksAction = async (email: string, session: string) => {
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.error;
             throw errorMessage;
         }
     } catch (error) {
@@ -55,12 +55,12 @@ export const upsertTaskAction = async (task: ITask, session: string) => {
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: `Task ${successMessage}.`,
-                data: data.result,
+                data: data.data,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.error;
             throw errorMessage;
         }
     } catch (error) {
@@ -99,7 +99,7 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.error;
             throw errorMessage;
         }
     } catch (error) {
@@ -126,7 +126,7 @@ export const reorderTasksAction = async (firstID: string, firstOrder: number, se
                 value: secondOrder
             }
         ]
-        const response = await fetch(`${URL}/api/tasks/reorder`, {
+        const response = await fetch(`${URL}/api/tasks/patch`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export const reorderTasksAction = async (firstID: string, firstOrder: number, se
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.error;
             throw errorMessage;
         }
     } catch (error) {
@@ -176,7 +176,7 @@ export const deleteTaskAction = async (task: ITask, session: string) => {
             return APIResponse;
         }
         else {
-            const errorMessage = data.msg.message;
+            const errorMessage = data.error;
             throw errorMessage;
         }
     } catch (error) {

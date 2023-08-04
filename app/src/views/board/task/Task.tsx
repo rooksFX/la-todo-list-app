@@ -44,7 +44,7 @@ const Task = ({ data, editTask, deleteTask, updateTaskStatus, reorderTask }: ITa
                             <button className='btn-primary btn-icon' onClick={editTask}><EditFilled /></button>
                             <button className='btn-error btn-icon' onClick={deleteTask}><DeleteFilled /></button>
                         </header>
-                        <div className="task-detail"><h3>{data.order}: {data.task}</h3></div>
+                        <div className="task-detail"><h3>{data.task}</h3></div>
                         <footer className='actions status-actions'>
                             {renderChangeStatusButtons()}
                         </footer>

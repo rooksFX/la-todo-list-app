@@ -14,7 +14,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
         (req as CustomRequest).token = decoded;
         next();
     } catch (error) {
-        res.status(401).json({ msg: error });
+        res.status(401).json({ error });
     }
 }
 

@@ -54,9 +54,10 @@ export const createTask = async ( req: Request, res: Response ) => {
 
         res.status(200).json({
             success: true,
-            result: newTask
+            data: newTask
         });
     } catch (error) {
+        console.log('createTask | error: ', error);
         res.status(500).json({ error });
     }
 };
@@ -85,13 +86,13 @@ export const updateTask = async ( req: Request, res: Response ) => {
             });
         }
     } catch (error) {
+        console.log('updateTask | error: ', error);
         res.status(500).json({ error });
     }
 };
 
 export const patchTask = async ( req: Request, res: Response ) => {
     let { _id: id } = req.body;
-    let { _id } = req.body;
 
     console.log('patchTask started... ');
     console.log('patchTask | req.body: ', req.body);
@@ -136,7 +137,11 @@ export const patchTasks = async ( req: Request, res: Response ) => {
             data: { message: 'Tasks updated.' }
         });
     } catch (error) {
-        
+        console.log('patchTasks | error: ', error);
+        res.status(500).json({
+                success: false,
+                error: 'Internal Server Error.'
+            });
     }
 };
 
@@ -165,6 +170,7 @@ export const deleteTask = async ( req: Request, res: Response ) => {
             });
         }
     } catch (error) {
+        console.log('deleteTask | error: ', error);
         res.status(500).json({ error });
     }
 };
