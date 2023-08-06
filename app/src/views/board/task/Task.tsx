@@ -1,4 +1,4 @@
-import { CaretUpFilled, CaretDownFilled, EditFilled, DeleteFilled } from '@ant-design/icons';
+import { EditFilled, DeleteFilled } from '@ant-design/icons';
 
 import { ITask } from '../../../context/types';
 
