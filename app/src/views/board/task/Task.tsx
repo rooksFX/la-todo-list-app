@@ -11,11 +11,10 @@ interface ITaskProps {
     editTask: () => void;
     deleteTask: () => void;
     updateTaskStatus: (data: ITask, newStatus: string) => void;
-    reorderTask: (up: boolean) => void;
     disabled: boolean;
 }
 
-const Task = ({ data, editTask, deleteTask, updateTaskStatus, reorderTask, disabled }: ITaskProps) => {
+const Task = ({ data, editTask, deleteTask, updateTaskStatus, disabled }: ITaskProps) => {
 
     const handleChangeStatus = (newStatus: string) => () => {
         updateTaskStatus(data, newStatus);

@@ -22,12 +22,16 @@ export const getTasks = async ( req: Request, res: Response ) => {
         }
         else {
             return res.status(200).json({
-                data: tasks       
+                tasks: tasks       
             });
         }
 
     } catch (error) {
-        res.status(500).json({ error });
+        console.log('getTasks | tasks: ', error);
+        res.status(500).json({
+                success: false,
+                error: "Oops! Something went wrong. Please try again later."
+            });
     }
 };
 
@@ -54,11 +58,14 @@ export const createTask = async ( req: Request, res: Response ) => {
 
         res.status(200).json({
             success: true,
-            data: newTask
+            task: newTask
         });
     } catch (error) {
         console.log('createTask | error: ', error);
-        res.status(500).json({ error });
+        res.status(500).json({
+                success: false,
+                error: "Oops! Something went wrong. Please try again later."
+            });
     }
 };
 
@@ -73,21 +80,24 @@ export const updateTask = async ( req: Request, res: Response ) => {
 
         console.log('updateTask | updatedTask: ', updatedTask);
 
-        if (!updatedTask) {
-            return res.status(400).json({
-                success: false,
-                error: 'No matching task found'
+        if (updatedTask) {
+            return res.status(200).json({
+                success: true,
+                task: updatedTask
             });
         }
         else {
-            return res.status(200).json({
-                success: true,
-                data: updatedTask
+            return res.status(400).json({
+                success: false,
+                error: 'No matching task found.'
             });
         }
     } catch (error) {
         console.log('updateTask | error: ', error);
-        res.status(500).json({ error });
+        res.status(500).json({
+                success: false,
+                error: "Oops! Something went wrong. Please try again later."
+            });
     }
 };
 
@@ -102,20 +112,24 @@ export const patchTask = async ( req: Request, res: Response ) => {
 
         console.log('patchTask | updatedTask: ', updatedTask);
 
-        if (!updatedTask) {
+        if (updatedTask) {
+            return res.status(200).json({
+                success: true,
+                task: updatedTask
+            });
+        }
+        else {
             return res.status(400).json({
                 success: false,
                 error: 'No matching task found'
             });
         }
-        else {
-            return res.status(200).json({
-                success: true,
-                data: updatedTask
-            });
-        }
     } catch (error) {
-        res.status(500).json({ error });
+        console.log('patchTask | error: ', error);
+        res.status(500).json({
+                success: false,
+                error: "Oops! Something went wrong. Please try again later."
+            });
     }
 };
 
@@ -134,13 +148,13 @@ export const patchTasks = async ( req: Request, res: Response ) => {
 
         return res.status(200).json({
             success: true,
-            data: { message: 'Tasks updated.' }
+            tasks: tasksToReorder
         });
     } catch (error) {
         console.log('patchTasks | error: ', error);
         res.status(500).json({
                 success: false,
-                error: 'Internal Server Error.'
+                error: "Oops! Something went wrong. Please try again later."
             });
     }
 };
@@ -166,11 +180,14 @@ export const deleteTask = async ( req: Request, res: Response ) => {
             await task.deleteOne();
             return res.status(200).json({
                 success: true,
-                data: task
+                task: task
             });
         }
     } catch (error) {
         console.log('deleteTask | error: ', error);
-        res.status(500).json({ error });
+        res.status(500).json({
+                success: false,
+                error: "Oops! Something went wrong. Please try again later."
+            });
     }
 };

@@ -14,7 +14,7 @@ interface IUpsertProps {
 
 const Upsert = ({ task: data, close, notify, upsertTasks }: IUpsertProps) => {
     const { user } = useContext(AppContext);
-    const [taskValue, setTaskValue] = useState(data?.task);
+    const [taskValue, setTaskValue] = useState(data?.task || '');
 
     const taskRef = useRef<HTMLInputElement>(null);
 

@@ -18,13 +18,13 @@ export const getTasksAction = async (email: string, session: string) => {
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: 'Tasks fetched.',
-                data: data.data,
+                data: data.tasks,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.error;
-            throw errorMessage;
+            const error = data.error;
+            throw error;
         }
     } catch (error) {
         console.error('Get Tasks error: ', error);
@@ -55,13 +55,13 @@ export const upsertTaskAction = async (task: ITask, session: string) => {
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: `Task ${successMessage}.`,
-                data: data.data,
+                data: data.task,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.error;
-            throw errorMessage;
+            const error = data.error;
+            throw error;
         }
     } catch (error) {
         console.error('Upsert Task error: ', error);
@@ -95,13 +95,13 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
                 success: true,
                 
                 message: 'Task updated.',
-                data: data.data,
+                data: data.task,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.error;
-            throw errorMessage;
+            const error = data.error;
+            throw error;
         }
     } catch (error) {
         console.error('Patch Task error: ', error);
@@ -130,13 +130,13 @@ export const reorderTasksAction = async (tasksToReorder: TTasksToReorder[], sess
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: 'Tasks updated.',
-                data: data.data,
+                data: data.tasks,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.error;
-            throw errorMessage;
+            const error = data.error;
+            throw error;
         }
     } catch (error) {
         console.error('Reorder Tasks error: ', error);
@@ -160,13 +160,13 @@ export const deleteTaskAction = async (task: ITask, session: string) => {
             const APIResponse: TAPIResponse = {
                 success: true,
                 message: `Task, "${task.task}",  deleted.`,
-                data: data.data,
+                data: data.task,
             }
             return APIResponse;
         }
         else {
-            const errorMessage = data.error;
-            throw errorMessage;
+            const error = data.error;
+            throw error;
         }
     } catch (error) {
         console.error('Delete Task error: ', error);

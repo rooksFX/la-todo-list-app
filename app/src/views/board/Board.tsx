@@ -5,17 +5,18 @@ import { LogoutOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 
 import { AppContext } from '../../context/State';
-import { ITask, TAPIResponse, TTasksToReorder } from '../../context/types';
+import { ITask, TAPIResponse } from '../../context/types';
 
 import Card from '../../components/card/Card';
 import Toaster from '../../components/toaster/Toaster';
 import Spinner from '../../components/spinner/Spinner';
 
 import { deleteTaskAction, getTasksAction, patchTaskAction, reorderTasksAction } from './TaskActions';
+
 import Task from './task/Task';
 import Upsert from './upsert/Upsert';
+
 import './board.scss';
-import { useStateWithDeps } from 'swr/_internal';
 
 const COLUMNS = [
   {
@@ -51,26 +52,12 @@ const Board = () => {
     const [isReorderingTasks, setIsReorderingTasks] = useState(false)
 
     const isReordering = useRef(false);
-    
-    const [backupTodoTasks, setBackupTodoTasks] = useState<ITask[]>([]);
-    const [backupWipTasks, setBackupWipTasks] = useState<ITask[]>([]);
-    const [backupDoneTasks, setBackupDoneTasks] = useState<ITask[]>([]);
 
     const backupTodoTasksRef = useRef<ITask[]>([]);
     const backupWipTasksRef = useRef<ITask[]>([]);
     const backupDoneTasksRef = useRef<ITask[]>([]);
 
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // const prevTodoTasks = useRef<ITask[]>([]);
-    // const prevWipTasks = useRef<ITask[]>([]);
-    // const prevDoneTasks = useRef<ITask[]>([]);
-
-    // const [isReordering, setIsReordering] = useState(false)
-
-    // console.log('RENDER todoTasks: ', todoTasks);
-    // console.log('RENDER wipTasks: ', wipTasks);
-    // console.log('RENDER doneTasks: ', doneTasks);
 
     useEffect(() => {
       const session_token = localStorage.getItem('session_token');
@@ -86,6 +73,7 @@ const Board = () => {
       setIsLoading(true);
       const email = localStorage.getItem('email');
       const response = await getTasksAction(email as string, user.session);
+
       if (response.success) {
         if (updateTasksAction) updateTasksAction(response?.data as unknown as ITask[]);
         const tasksData = response.data as ITask[];
@@ -236,78 +224,6 @@ const Board = () => {
       openToaster(response);
     }
 
-    const handleReorderTask = async (task: ITask, up: boolean) => {
-      const column = task.status;
-
-      switch (column) {
-        case 'todo':
-          const newTodoTasks = await reorderTask(task, todoTasks, up);
-          if (!newTodoTasks.length) return;
-          setTodoTasks(newTodoTasks);
-          break;
-        case 'wip':
-          const newWipTasks = await reorderTask(task, wipTasks, up);
-          if (!newWipTasks.length) return;
-          setWipTasks(newWipTasks);
-          break;
-        default:
-          const newDoneTasks = await reorderTask(task, doneTasks, up);
-          if (!newDoneTasks.length) return;
-          setDoneTasks(newDoneTasks);
-          break;
-      }
-      setTaskUpdating(false);
-    }
-
-    const reorderTask = async (task: ITask, tasksToUpdate: ITask[], up: boolean,) => {
-          const newTasksToUpdate = [...tasksToUpdate];
-          const index = newTasksToUpdate.findIndex(findTask => findTask._id === task._id);
-
-          const indexOfSwapped = up? index - 1 : index + 1;
-          if ([-1, tasksToUpdate.length].includes(indexOfSwapped)) return [];
-          const taskToReplace = newTasksToUpdate[indexOfSwapped];
-          delete newTasksToUpdate[indexOfSwapped];
-          delete newTasksToUpdate[index];
-          const task_order = task.order;
-          const taskToReplace_order = taskToReplace.order;
-
-          // Call API action
-          setTaskUpdating(true);
-        
-            const tasksToReorder: TTasksToReorder[] = [
-              {
-                _id: task._id as string,
-                field: 'order',
-                value: taskToReplace_order as number
-              },
-              {
-                _id: taskToReplace._id as string,
-                field: 'order',
-                value: task_order as number
-              }
-            ]
-
-          const APIResponse = await reorderTasksAction(
-            tasksToReorder,
-            sessionToken
-          )
-
-          if (APIResponse.success) {
-            task.order = taskToReplace_order;
-            taskToReplace.order = task_order;
-            newTasksToUpdate[indexOfSwapped] = task;
-            newTasksToUpdate[index] = taskToReplace;
-            newTasksToUpdate.sort((a, b) => (a.order as unknown as number) - (b.order as unknown as number));
-            return newTasksToUpdate;
-          }
-          else {
-            if (APIResponse.message === 'jwt expired') {
-              navigate('/logout');
-            }
-          }
-          return [];
-    }
-
     const renderTasks = (columnStatus: string) => {
       let tasks: ITask[] = columnStatus === 'todo' ? todoTasks : columnStatus === 'wip' ? wipTasks : doneTasks;
       let tasksEl = [];
@@ -325,7 +241,6 @@ const Board = () => {
                     editTask={() => handleUpdateTask(task)}
                     deleteTask={() => handleDeleteTask(task)}
                     updateTaskStatus={handleUpdateTaskStatus}
-                    reorderTask={(up: boolean) => handleReorderTask(task, up)}
                     data={task}
                     disabled={isReorderingTasks}
                   />
@@ -346,9 +261,6 @@ const Board = () => {
     }
 
     const handleDrop = (droppedItem: DropResult) => {
-      console.log('handleDrop | todoTasks');
-      console.log('handleDrop | isReordering.current: ', isReordering.current);
-
       if (!droppedItem.destination) return;
       let column = droppedItem.destination.droppableId;
       let sourceIndex = droppedItem.source.index;
@@ -389,28 +301,18 @@ const Board = () => {
           columnToUpdate[index].order = task.order;
         }
       });
-      console.log('handleDrop | originalColumnData: ', originalColumnData);
-      console.log('handleDrop | columnToUpdate: ', columnToUpdate);
-
-      // Update State
-      // setIsReordering(true);
 
       if (!isReorderingTasks) setIsReorderingTasks(true);
       columnSetter(columnToUpdate);
       isReordering.current = true;
-      console.log('timerRef.current: ', timerRef.current);
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         isReordering.current = false;
-        console.log('reorderTasks!');
         reorderTasks(columnToUpdate, backupColumn, columnSetter);
       }, 3000)
     };
   
     const reorderTasks = async (columnToUpdate: ITask[],  backupColumn: MutableRefObject<ITask[]>, columnSetter: (tasks: ITask[]) => void) => {
-
-        console.log('reorderTasks | todoTasks: ', todoTasks);
-
           const tasksToReorder = columnToUpdate.map(task => {
             return {
               _id: task._id as string,
@@ -426,7 +328,6 @@ const Board = () => {
           )
 
           if (APIResponse.success) {
-            console.log('Tasks reordered!');
             backupColumn.current = [];
           }
           else {
