@@ -1,4 +1,4 @@
-import { ITask, TAPIResponse } from "../../context/types";
+import { ITask, TAPIResponse, TTasksToReorder } from "../../context/types";
 
 const PROD_API = 'https://tasks-api-la.onrender.com'
 const URL = process.env.NODE_ENV === 'production' ? PROD_API : '';
@@ -93,6 +93,7 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
         if (response.ok) {
             const APIResponse: TAPIResponse = {
                 success: true,
+                
                 message: 'Task updated.',
                 data: data.data,
             }
@@ -112,21 +113,9 @@ export const patchTaskAction = async (id: string, field: string, value: string, 
     }
 }
 
-export const reorderTasksAction = async (firstID: string, firstOrder: number, secondID: string, secondOrder: number, session: string) => {
+export const reorderTasksAction = async (tasksToReorder: TTasksToReorder[], session: string) => {
     try {
-        const tasksToReorder = [
-            {
-                _id: firstID,
-                field: 'order',
-                value: firstOrder
-            },
-            {
-                _id: secondID,
-                field: 'order',
-                value: secondOrder
-            }
-        ]
-        const response = await fetch(`${URL}/api/tasks/patch`, {
+        const response = await fetch(`${URL}/api/tasks/reorder`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',

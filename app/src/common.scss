@@ -66,6 +66,10 @@ button {
     font-size: 1em;
     padding: 0.6em 1.2em;
 
+    &:disabled {
+        cursor: not-allowed;
+    }
+
     &:hover {
         box-shadow: 3px 3px 7px #5c5c5c;
         transform: translate(-2px, -2px);

@@ -40,6 +40,12 @@ export type TAPIResponse = {
     message: string;
 }
 
+export type TTasksToReorder = {
+    _id: string,
+    field: string,
+    value: number
+}
+
 export enum ActionTypes {
     GET_USER_TASKS_SUCCESS_ACTION = 'GET_USER_TASKS_SUCCESS_ACTION',
     LOGIN_SUCCESS_ACTION = 'LOGIN_SUCCESS_ACTION',

@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { MutableRefObject, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { LogoutOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 
 import { AppContext } from '../../context/State';
-import { ITask, TAPIResponse } from '../../context/types';
+import { ITask, TAPIResponse, TTasksToReorder } from '../../context/types';
 
 import Card from '../../components/card/Card';
 import Toaster from '../../components/toaster/Toaster';
@@ -14,6 +15,7 @@ import { deleteTaskAction, getTasksAction, patchTaskAction, reorderTasksAction }
 import Task from './task/Task';
 import Upsert from './upsert/Upsert';
 import './board.scss';
+import { useStateWithDeps } from 'swr/_internal';
 
 const COLUMNS = [
   {
@@ -46,6 +48,29 @@ const Board = () => {
     const [todoTasks, setTodoTasks] = useState<ITask[]>([]);
     const [wipTasks, setWipTasks] = useState<ITask[]>([]);
     const [doneTasks, setDoneTasks] = useState<ITask[]>([]);
+    const [isReorderingTasks, setIsReorderingTasks] = useState(false)
+
+    const isReordering = useRef(false);
+    
+    const [backupTodoTasks, setBackupTodoTasks] = useState<ITask[]>([]);
+    const [backupWipTasks, setBackupWipTasks] = useState<ITask[]>([]);
+    const [backupDoneTasks, setBackupDoneTasks] = useState<ITask[]>([]);
+
+    const backupTodoTasksRef = useRef<ITask[]>([]);
+    const backupWipTasksRef = useRef<ITask[]>([]);
+    const backupDoneTasksRef = useRef<ITask[]>([]);
+
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // const prevTodoTasks = useRef<ITask[]>([]);
+    // const prevWipTasks = useRef<ITask[]>([]);
+    // const prevDoneTasks = useRef<ITask[]>([]);
+
+    // const [isReordering, setIsReordering] = useState(false)
+
+    // console.log('RENDER todoTasks: ', todoTasks);
+    // console.log('RENDER wipTasks: ', wipTasks);
+    // console.log('RENDER doneTasks: ', doneTasks);
 
     useEffect(() => {
       const session_token = localStorage.getItem('session_token');
@@ -248,11 +273,22 @@ const Board = () => {
 
           // Call API action
           setTaskUpdating(true);
+        
+            const tasksToReorder: TTasksToReorder[] = [
+              {
+                _id: task._id as string,
+                field: 'order',
+                value: taskToReplace_order as number
+              },
+              {
+                _id: taskToReplace._id as string,
+                field: 'order',
+                value: task_order as number
+              }
+            ]
+
           const APIResponse = await reorderTasksAction(
-            task._id as string,
-            taskToReplace_order as number, 
-            taskToReplace._id as string, 
-            task_order as number, 
+            tasksToReorder,
             sessionToken
           )
 
@@ -273,18 +309,31 @@ const Board = () => {
     }
 
     const renderTasks = (columnStatus: string) => {
-      let tasks = columnStatus === 'todo' ? todoTasks : columnStatus === 'wip' ? wipTasks : doneTasks;
+      let tasks: ITask[] = columnStatus === 'todo' ? todoTasks : columnStatus === 'wip' ? wipTasks : doneTasks;
       let tasksEl = [];
-      for (const task of tasks) {
+      for (const [index, task] of tasks.entries()) {
         const taskEl = (
-          <Task 
-            key={crypto.randomUUID()}
-            editTask={() => handleUpdateTask(task)}
-            deleteTask={() => handleDeleteTask(task)}
-            updateTaskStatus={handleUpdateTaskStatus}
-            reorderTask={(up: boolean) => handleReorderTask(task, up)}
-            data={task} 
-          />
+          <Draggable key={task._id} draggableId={index.toString()} index={index} >
+            {provided => (
+                <div className="task-container"
+                  ref={provided.innerRef}
+                  {...provided.dragHandleProps}
+                  {...provided.draggableProps}
+                >
+                  <Task 
+                    key={task._id}
+                    editTask={() => handleUpdateTask(task)}
+                    deleteTask={() => handleDeleteTask(task)}
+                    updateTaskStatus={handleUpdateTaskStatus}
+                    reorderTask={(up: boolean) => handleReorderTask(task, up)}
+                    data={task}
+                    disabled={isReorderingTasks}
+                  />
+                </div>
+
+              )
+            }
+          </Draggable>
         )
         tasksEl.push(taskEl);
       }
@@ -294,6 +343,99 @@ const Board = () => {
     const renderTasksCount = (columnStatus: string) => {
       let tasks = columnStatus === 'todo' ? todoTasks : columnStatus === 'wip' ? wipTasks : doneTasks;
       return tasks.length || '-';
+    }
+
+    const handleDrop = (droppedItem: DropResult) => {
+      console.log('handleDrop | todoTasks');
+      console.log('handleDrop | isReordering.current: ', isReordering.current);
+
+      if (!droppedItem.destination) return;
+      let column = droppedItem.destination.droppableId;
+      let sourceIndex = droppedItem.source.index;
+      let destinationIndex = droppedItem.destination.index;
+      let columnToUpdate: ITask[] = [];
+      let originalColumnData: ITask[] = [];
+      let backupColumn: MutableRefObject<ITask[]>;
+      let columnSetter = setDoneTasks;
+      switch (column) {
+        case 'todo':
+          columnToUpdate = JSON.parse(JSON.stringify(todoTasks));
+          originalColumnData = JSON.parse(JSON.stringify(todoTasks));
+          backupColumn = backupTodoTasksRef;
+          columnSetter = setTodoTasks;
+          break;
+        case 'wip':
+          columnToUpdate = JSON.parse(JSON.stringify(wipTasks));
+          originalColumnData = JSON.parse(JSON.stringify(wipTasks));
+          backupColumn = backupWipTasksRef;
+          columnSetter = setWipTasks;
+          break;
+        default:
+          columnToUpdate = JSON.parse(JSON.stringify(doneTasks));
+          originalColumnData = JSON.parse(JSON.stringify(doneTasks));
+          backupColumn = backupDoneTasksRef;
+          break;
+      }
+
+      if (backupColumn && !backupColumn.current.length) backupColumn.current = originalColumnData;
+      
+      // Remove dragged item
+      const [reorderedItem] = columnToUpdate.splice(sourceIndex, 1);
+      // Add dropped item
+      columnToUpdate.splice(destinationIndex, 0, reorderedItem);
+        
+      originalColumnData.forEach((task: ITask, index: number) => {
+        if (columnToUpdate[index].order !== task.order) {
+          columnToUpdate[index].order = task.order;
+        }
+      });
+      console.log('handleDrop | originalColumnData: ', originalColumnData);
+      console.log('handleDrop | columnToUpdate: ', columnToUpdate);
+
+      // Update State
+      // setIsReordering(true);
+
+      if (!isReorderingTasks) setIsReorderingTasks(true);
+      columnSetter(columnToUpdate);
+      isReordering.current = true;
+      console.log('timerRef.current: ', timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        isReordering.current = false;
+        console.log('reorderTasks!');
+        reorderTasks(columnToUpdate, backupColumn, columnSetter);
+      }, 3000)
+    };
+  
+    const reorderTasks = async (columnToUpdate: ITask[],  backupColumn: MutableRefObject<ITask[]>, columnSetter: (tasks: ITask[]) => void) => {
+
+        console.log('reorderTasks | todoTasks: ', todoTasks);
+
+          const tasksToReorder = columnToUpdate.map(task => {
+            return {
+              _id: task._id as string,
+              field: 'order',
+              value: task.order as number
+            }
+          })
+
+          setTaskUpdating(true);
+          const APIResponse = await reorderTasksAction(
+            tasksToReorder,
+            sessionToken
+          )
+
+          if (APIResponse.success) {
+            console.log('Tasks reordered!');
+            backupColumn.current = [];
+          }
+          else {
+            // Revert to old data
+            columnSetter(backupColumn.current);
+          }
+
+          setIsReorderingTasks(false);
+          setTaskUpdating(false);
     }
 
     if (isLoading) {
@@ -312,15 +454,22 @@ const Board = () => {
             <button className='logout btn-error' onClick={handleLogout}><LogoutOutlined /> LOGOUT</button>
           </div>
         </header>
-        <div id='board-grid'>
+        <div key={crypto.randomUUID()} id='board-grid'>
             {COLUMNS.map(column => (
-              <div key={crypto.randomUUID()} className={`column ${column.status}`}>
-                    <h4>{column.title} {renderTasksCount(column.status)}</h4>
-                    <>
-                        {renderTasks(column.status)}
-                    </>
-                    {column.status === 'todo' && (<button className='add-task btn-primary' onClick={() => setIsUpsertOpen(true)}><PlusOutlined /> ADD TASK</button>)}
-              </div>
+              <DragDropContext key={crypto.randomUUID()} onDragEnd={handleDrop}>
+                <Droppable droppableId={`${column.status}`} >
+                  {(provided) => (
+                    <div id={`${column.status}`} className={`column ${column.status}`} ref={provided.innerRef} {...provided.droppableProps}>
+                          <h4>{column.title} {renderTasksCount(column.status)}</h4>
+                          <>
+                              {renderTasks(column.status)}
+                              {provided.placeholder}
+                          </>
+                          {column.status === 'todo' && (<button className='add-task btn-primary' onClick={() => setIsUpsertOpen(true)} disabled={isReorderingTasks} ><PlusOutlined /> ADD TASK</button>)}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext> 
             ))}
           </div>
         <Toaster message={toasterMessage} type={toasterType} />
