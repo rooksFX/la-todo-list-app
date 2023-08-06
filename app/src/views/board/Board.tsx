@@ -2,7 +2,7 @@ import { MutableRefObject, useContext, useEffect, useRef, useState } from 'react
 import { useNavigate } from 'react-router-dom';
 
 import { LogoutOutlined, PlusOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 
 import { AppContext } from '../../context/State';
 import { ITask, TAPIResponse, TTasksToReorder } from '../../context/types';
@@ -345,7 +345,7 @@ const Board = () => {
       return tasks.length || '-';
     }
 
-    const handleDrop = (droppedItem) => {
+    const handleDrop = (droppedItem: DropResult) => {
       console.log('handleDrop | todoTasks');
       console.log('handleDrop | isReordering.current: ', isReordering.current);
 
